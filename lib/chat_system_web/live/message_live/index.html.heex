@@ -1,0 +1,46 @@
+<h1>Listing Messages</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <.modal return_to={Routes.message_index_path(@socket, :index)}>
+    <.live_component
+      module={ChatSystemWeb.MessageLive.FormComponent}
+      id={@message.id || :new}
+      title={@page_title}
+      action={@live_action}
+      message={@message}
+      return_to={Routes.message_index_path(@socket, :index)}
+    />
+  </.modal>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Text</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="messages">
+    
+  </tbody>
+</table>
+
+
+<%=for person <- @users do%>
+<span phx-click="choose" phx-value-id = {person.id} style = "display:block; cursor:pointer;">start a chat with <%=person.email%></span>
+<%end %>
+ <.form
+    let={f}
+    for={@changeset}
+    id="message-form"
+    phx-submit="save">
+  
+    <%= label f, :text %>
+    <%= text_input f, :text %>
+    <%= error_tag f, :text %>
+  
+    <div>
+      <%= submit "Save", phx_disable_with: "Saving..." %>
+    </div>
+  </.form>
