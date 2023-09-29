@@ -21,6 +21,11 @@ defmodule ChatSystem.Messages do
     Repo.all(Message)
   end
 
+  def my_messages(id) do
+    Repo.all(from m in Message, where: m.receiver_id == ^id)
+    |> Repo.preload(:user)
+  end
+
   @doc """
   Gets a single message.
 

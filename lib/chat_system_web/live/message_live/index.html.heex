@@ -13,20 +13,13 @@
   </.modal>
 <% end %>
 
-<table>
-  <thead>
-    <tr>
-      <th>Text</th>
-
-      <th></th>
-    </tr>
-  </thead>
-  <tbody id="messages">
-    
-  </tbody>
-</table>
+<%=for message <- @messages do%>
+<span>sender:<%=message.user.email%></span>
+<span style = "display:block; cursor:pointer;"><%=message.text%></span>
+<%end %>
 
 
+<h3>People you can chat with down below</h3>
 <%=for person <- @users do%>
 <span phx-click="choose" phx-value-id = {person.id} style = "display:block; cursor:pointer;">start a chat with <%=person.email%></span>
 <%end %>

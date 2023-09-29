@@ -11,26 +11,42 @@ defmodule ChatSystemWeb.MessageLive.Index do
     user = Accounts.get_user_by_session_token(session["user_token"])
     IO.inspect(user.id)
     users = Accounts.list_users()
+    my_messages = Messages.my_messages(user.id)
 
     {:ok,
      socket
      |> assign(:messages, list_messages())
      |> assign(:changeset, changeset)
      |> assign(:user, user)
-     |> assign(:users, users)}
+     |> assign(:users, users)
+     |> assign(:messages, my_messages)}
   end
 
-  def handle_event("choose", params, socket) do
-    IO.inspect(params)
-    {:noreply, socket}
+  def handle_event("choose", %{"id" => id}, socket) do
+    new_id = String.to_integer(id)
+
+    {:noreply,
+     socket
+     |> assign(:receiver_id, new_id)}
   end
 
   def handle_event("save", %{"message" => message_params}, socket) do
-    IO.inspect(message_params)
-
     new_message =
       message_params
       |> Map.put("sender_id", socket.assigns.user.id)
+      |> Map.put("receiver_id", socket.assigns.receiver_id)
+
+    IO.inspect(new_message)
+
+    case Messages.create_message(new_message) do
+      {:ok, _message} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Message created successfully")}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, changeset: changeset)}
+    end
 
     {:noreply, socket}
   end
