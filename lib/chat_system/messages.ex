@@ -17,6 +17,31 @@ defmodule ChatSystem.Messages do
       [%Message{}, ...]
 
   """
+  def subscribe() do
+    Phoenix.PubSub.subscribe(ChatSystem.PubSub, "messaging")
+  end
+
+  #  the code below broadcasts a message to the the topic "mytopic"
+  def publish({:ok, message}, tag) do
+    new_message =
+    message
+    |> Repo.preload(:user)
+    IO.inspect(message)
+
+    Phoenix.PubSub.broadcast(ChatSystem.PubSub, "messaging", {tag, new_message})
+
+    {:ok, message}
+  end
+
+  def publish({:error, _changeset} = error, _tag), do: error
+
+  def create_message(attrs \\ %{}) do
+    %Message{}
+    |> Message.changeset(attrs)
+    |> Repo.insert()
+    |> publish(:message_created)
+  end
+
   def list_messages do
     Repo.all(Message)
   end
@@ -54,11 +79,6 @@ defmodule ChatSystem.Messages do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_message(attrs \\ %{}) do
-    %Message{}
-    |> Message.changeset(attrs)
-    |> Repo.insert()
-  end
 
   @doc """
   Updates a message.

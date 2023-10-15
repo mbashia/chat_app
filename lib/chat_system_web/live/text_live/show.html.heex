@@ -1,0 +1,27 @@
+<h1>Show Text</h1>
+
+<%= if @live_action in [:edit] do %>
+  <.modal return_to={Routes.text_show_path(@socket, :show, @text)}>
+    <.live_component
+      module={ChatSystemWeb.TextLive.FormComponent}
+      id={@text.id}
+      title={@page_title}
+      action={@live_action}
+      text={@text}
+      return_to={Routes.text_show_path(@socket, :show, @text)}
+    />
+  </.modal>
+<% end %>
+
+<ul>
+  <li>
+    <strong>Message:</strong>
+    <%= @text.message %>
+  </li>
+</ul>
+
+<span>
+  <%= live_patch("Edit", to: Routes.text_show_path(@socket, :edit, @text), class: "button") %>
+</span>
+|
+<span><%= live_redirect("Back", to: Routes.text_index_path(@socket, :index)) %></span>

@@ -1,0 +1,48 @@
+<h1>Listing Texts</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <.modal return_to={Routes.text_index_path(@socket, :index)}>
+    <.live_component
+      module={ChatSystemWeb.TextLive.FormComponent}
+      id={@text.id || :new}
+      title={@page_title}
+      action={@live_action}
+      text={@text}
+      return_to={Routes.text_index_path(@socket, :index)}
+    />
+  </.modal>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Message</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="texts">
+    <%= for text <- @texts do %>
+      <tr id={"text-#{text.id}"}>
+        <td><%= text.message %></td>
+
+        <td>
+          <span>
+            <%= live_redirect("Show", to: Routes.text_show_path(@socket, :show, text)) %>
+          </span>
+          <span><%= live_patch("Edit", to: Routes.text_index_path(@socket, :edit, text)) %></span>
+          <span>
+            <%= link("Delete",
+              to: "#",
+              phx_click: "delete",
+              phx_value_id: text.id,
+              data: [confirm: "Are you sure?"]
+            ) %>
+          </span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch("New Text", to: Routes.text_index_path(@socket, :new)) %></span>

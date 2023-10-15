@@ -21,6 +21,11 @@ defmodule ChatSystemWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    live "/texts", TextLive.Index, :index
+    live "/texts/new", TextLive.Index, :new
+    live "/texts/:id/edit", TextLive.Index, :edit
+
+    live "/texts/:id", TextLive.Show, :show
   end
 
   # Other scopes may use custom stacks.

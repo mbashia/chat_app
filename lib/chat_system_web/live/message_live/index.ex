@@ -7,6 +7,10 @@ defmodule ChatSystemWeb.MessageLive.Index do
 
   @impl true
   def mount(_params, session, socket) do
+    if connected?(socket) do
+      Messages.subscribe()
+    end
+
     changeset = Messages.change_message(%Message{})
     user = Accounts.get_user_by_session_token(session["user_token"])
     IO.inspect(user.id)
@@ -15,11 +19,18 @@ defmodule ChatSystemWeb.MessageLive.Index do
 
     {:ok,
      socket
-     |> assign(:messages, list_messages())
      |> assign(:changeset, changeset)
      |> assign(:user, user)
      |> assign(:users, users)
-     |> assign(:messages, my_messages)}
+     |> assign(:messages, my_messages)
+     |> assign(:show_div, 0)}
+  end
+
+  @impl true
+  def handle_info({:message_created, message}, socket) do
+    {:noreply,
+     socket
+     |> assign(:messages, [message | socket.assigns.messages])}
   end
 
   def handle_event("choose", %{"id" => id}, socket) do
@@ -27,7 +38,8 @@ defmodule ChatSystemWeb.MessageLive.Index do
 
     {:noreply,
      socket
-     |> assign(:receiver_id, new_id)}
+     |> assign(:receiver_id, new_id)
+     |> assign(:show_div, 1)}
   end
 
   def handle_event("save", %{"message" => message_params}, socket) do
